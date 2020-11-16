@@ -1,6 +1,9 @@
 <?php
+//ini_set('error_reporting', E_ALL);
+//ini_set('display_errors', 1);
+//ini_set('display_startup_errors', 1);
 
-require_once __DIR__ . "/vendor/autoload.php";
+require_once "../vendor/autoload.php";
 require_once "functions.php";
 require_once "initialize.php";
 
@@ -37,20 +40,23 @@ try {
      *   webhookUrl    Webhook location, used to report when the payment changes state.
      *   metadata      Custom metadata that is stored with the payment.
      */
+    $amount = isset($_POST['amount'])?$_POST['amount']:"0.01";
+//    $amount = "0.01";
     $paymentForm = [
         "amount" => [
             "currency" => "EUR",
-            "value" => $_POST['value'] // You must send the correct number of decimals, thus we enforce the use of strings
+            "value" => $amount // You must send the correct number of decimals, thus we enforce the use of strings
         ],
         "description" => "Order #{$orderId}",
 //        "testmode" => "true",
-//        "redirectUrl" => "{$protocol}://{$hostname}{$path}/payments/return.php?order_id={$orderId}",
+        "redirectUrl" => "{$protocol}://{$hostname}{$path}/return.php?order_id={$orderId}",
+//        "redirectUrl" => "{$protocol}://{$hostname}/mollie/payment/payment_redirect.php?order_id={$orderId}",
 //        "redirectUrl" => "{$protocol}://{$hostname}/public/payment_redirect.php?order_id={$orderId}",
-        "redirectUrl" => "{$protocol}://{$hostname}/mollie/payment/payment_redirect.php?order_id={$orderId}",
+//        "redirectUrl" => "{$protocol}://{$hostname}/mollie/payment/payment_redirect.php?order_id={$orderId}",
 //        "webhookUrl" => "{$protocol}://{$hostname}{$path}/payments/webhook.php",
 //        "webhookUrl" => "{$protocol}://{$hostname}/public/payment.php",
 //        "webhookUrl" => "{$protocol}://{$hostname}/public/webhook.php",
-        "webhookUrl" => "{$protocol}://{$hostname}/mollie/payment/webhook.php",
+        "webhookUrl" => "{$protocol}://{$hostname}{$path}/webhook.php",
         "metadata" => [
             "order_id" => $orderId,
         ],
@@ -63,7 +69,7 @@ try {
 //        database_write($orderId, "paid");
 //        exit;
 //    var_dump($payment);
-    var_dump($paymentForm);
+//    var_dump($paymentForm);
 //    exit;
 
     $payment = $mollie->payments->create($paymentForm);
