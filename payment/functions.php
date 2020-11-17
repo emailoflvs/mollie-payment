@@ -90,3 +90,14 @@ function database_write($orderId, $payment)
 
     }
 }
+
+function timeConverting ($time){
+
+    if (is_null($time))
+        return "";
+
+    $date = new \DateTime($time, new DateTimeZone('Europe/Kiev'));
+    $time = $date->format("Y-m-d H:i");
+
+    return $time;
+}

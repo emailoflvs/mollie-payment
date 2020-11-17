@@ -2,6 +2,9 @@
 /*
  * How to list your payments.
  */
+require_once "../vendor/autoload.php";
+require_once "functions.php";
+require_once "initialize.php";
 
 try {
     /*
@@ -9,7 +12,7 @@ try {
      *
      * See: https://www.mollie.com/dashboard/developers/api-keys
      */
-    require "initialize.php";
+//    require "initialize.php";
 //    require_once __DIR__ . "/../examples/initialize.php";
 
 
@@ -120,13 +123,3 @@ try {
     echo "API call failed: " . htmlspecialchars($e->getMessage());
 }
 
-function timeConverting ($time){
-    $time = explode("+",$time);
-$time = $time[0];
-//var_dump($time);
-//    $time = DateTime::createFromFormat("Y-m-d\TH:i:s", $time);
-//var_dump($time);
-//
-//exit;
-    return $time;
-}
