@@ -3,20 +3,19 @@
  * NOTE: The examples are using a text file as a database.
  * Please use a real database like MySQL in production code.
  */
+require_once "../../wp-config.php";
 
-function database_connection (){
-
-    // Соединяемся, выбираем базу данных
-    $host = "195.123.217.33";
-    $host = "localhost";
-    $user = "prizeme.de";
-    $password="1Q7j0B3s";
-    $dbName = "prizeme.de";
+function database_connection()
+{
+        // Соединяемся, выбираем базу данных
+//    $host = "195.123.217.33";
+//    $host = "localhost";
+//    $user = "prizeme.de";
+//    $password = "1Q7j0B3s";
+//    $dbName = "prizeme.de";
 
     //Соединяемся с базой данных используя наши доступы:
-    $link = mysqli_connect($host, $user, $password, $dbName);
-
-    //Устанавливаем кодировку (не обязательно, но поможет избежать проблем):
+    $link = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
     mysqli_query($link, "SET NAMES 'utf8'");
 
     return $link;
@@ -25,57 +24,69 @@ function database_connection (){
 function database_read($orderId)
 {
     $orderId = intval($orderId);
-    $database = dirname(__FILE__) . "/database/order-{$orderId}.txt";
 
-    $status = @file_get_contents($database);
+    $link = database_connection();
 
-    return $status ? $status : "unknown order";
+    // Проверяем, есть ли уже запись с order_id
+    $query = "SELECT * FROM `prizeme.de`.`payments` where `order_id`=" . $orderId;
+    $result = mysqli_query($link, $query) or die(mysqli_error($link));
+
+    $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    if (empty($rows))
+        return "unknown order";
+    else
+        return $rows[0];
 }
 
 function database_write($orderId, $payment)
 {
+    $orderId = intval($orderId);
+
     $link = database_connection();
 
-    $insert_query = "INSERT INTO `prizeme.de`.`payments` (`id`, `mollie_payment_id`, `mode`, `amount_currency`, 
-`amount_value`, `settlement_amount`, `amount_refunded_value`, `amount_refunded_currency`, `amount_remaining_value`,
- `amountRemainingCurrency`, `description`, `redirect_url`, `webhook_url`, `method`, `status`, `created_at`, 
- `paid_at`, `canceled_at`, `expires_at`, `failed_at`, `profile_id`, `sequence_type`, `mandate_id`) 
- VALUES (NULL, 'fr_ddd', 'test', 'UA', '10', '', '', '', '', '', NULL, NULL, NULL, NULL, '', '000', '111', 
- NULL, NULL, NULL, NULL, NULL, NULL);";
+    // Проверяем, есть ли уже запись с order_id - если нет, то создаем
+    $query = "SELECT * FROM `prizeme.de`.`payments` where `order_id`=" . $orderId;
+    $result = mysqli_query($link, $query) or die(mysqli_error($link));
+    $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-//    //Делаем запрос к БД, результат запроса пишем в $result:
-    $result = mysqli_query($link, $insert_query) or die(mysqli_error($link));
-//Проверяем что же нам отдала база данных, если null – то какие-то проблемы:
-        if($result)
-            return true;
-        else
-            return false;
+    if (empty($rows)) {
+        $query = "INSERT INTO `payments`(`id`, `mollie_payment_id`, `order_id`, `mode`, `currency`, `value`, 
+        `description`, `method`, `status`, `created_at`, `paid_at`, `canceled_at`, `expires_at`, `failed_at`) 
+        VALUES (NULL,NULL,'" . $orderId . "',NULL,NULL,NULL,NULL,NULL,'open',NULL,NULL,NULL,NULL,NULL)";
 
-//    var_dump($result);
+        $result = mysqli_query($link, $query) or die(mysqli_error($link));
 
-    //Формируем тестовый запрос:
-//    $query = "SELECT * FROM `prizeme.de`.`payments` ";
-////
-////    //Делаем запрос к БД, результат запроса пишем в $result:
-//    $result = mysqli_query($link, $query) or die(mysqli_error($link));
+    } else {
+
+        $query = "UPDATE `prizeme.de`.`payments` SET 
+        `mollie_payment_id` = '".$payment->id . "', 
+        `status` = '" . $payment->status . "', 
+        `mode` = '" . $payment->mode . "', 
+        `currency` = '" . $payment->amount->currency . "', 
+        `value` = '" . $payment->amount->value . "', 
+        `description` = '" . $payment->description . "', 
+        `method` = '" . $payment->method . "',
+        `created_at` = '" . $payment->createdAt . "',
+        `paid_at` = '" . $payment->paidAt . "',
+        `canceled_at` = '" . $payment->canceledAt . "',
+        `expires_at` = '" . $payment->expiresAt . "',
+        `failed_at` = '" . $payment->failedAt . "'
+        WHERE `payments`.`order_id` = " . $orderId . ";";
+
+//        //тестирование на отправке писем
+//        $to      = 'emailoflvs@gmail.com';
+//        $subject = 'hook '.$orderId." from database_write";
+//        $message = 'hook '.$orderId."\r\n
+//                status:".$payment->status."\r\n
+//                query:".$query."\r\n";
+//        $headers = 'From: emailoflvs@gmail.com' . "\r\n" .
+//            'Reply-To: emailoflvs@gmail.com' . "\r\n" .
+//            'X-Mailer: PHP/' . phpversion();
 //
-//    $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
-//    if($result)
-//    {
-//        echo "Выполнение запроса прошло успешно";
-//    }
-//    var_dump($rows);
+//        mail($to, $subject, $message, $headers);
 
-// закрываем подключение
-    mysqli_close($link);
-    //Проверяем что же нам отдала база данных, если null – то какие-то проблемы:
-//    var_dump($result);
+        $result = mysqli_query($link, $query) or die(mysqli_error($link));
 
-
-//    exit;
-
-//    $orderId = intval($orderId);
-//    $database = dirname(__FILE__) . "/database/order-{$orderId}.txt";
-
-//    file_put_contents($database, $status);
+    }
 }

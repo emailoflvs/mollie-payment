@@ -5,10 +5,6 @@
  * See: https://docs.mollie.com/guides/webhooks
  */
 
-//require_once __DIR__ . "/../vendor/autoload.php";
-//require_once __DIR__ . "/../examples/functions.php";
-//require_once __DIR__ . "/../examples/initialize.php";
-
 require_once "../vendor/autoload.php";
 require_once "functions.php";
 require_once "initialize.php";
@@ -27,36 +23,28 @@ try {
     $paymentId = $_POST["id"];
 //    $paymentId = "tr_Dn59RPJHCK";
 
-//    $payment = $mollie->payments->get($_POST["id"]);
+    //    $payment = $mollie->payments->get($_POST["id"]);
     $payment = $mollie->payments->get($paymentId);
     $orderId = $payment->metadata->order_id;
 
-    $to      = 'emailoflvs@gmail.com';
-//    $to      = 'vladimir@intera.dp.ua';
-    $subject = 'hook '.$orderId;
-    $message = 'hook '.$orderId."\r\n 
-                status:".$payment->status."\r\n".
-    "paymentId:".$paymentId;
-    $headers = 'From: emailoflvs@gmail.com' . "\r\n" .
-        'Reply-To: emailoflvs@gmail.com' . "\r\n" .
-        'X-Mailer: PHP/' . phpversion();
+//    //тестирование на отправке писем
+//    $to      = 'emailoflvs@gmail.com';
+////    $to      = 'vladimir@intera.dp.ua';
+//    $subject = 'hook '.$orderId;
+//    $message = 'hook '.$orderId."\r\n
+//                status:".$payment->status."\r\n".
+//        "paymentId:".$paymentId;
+//    $headers = 'From: emailoflvs@gmail.com' . "\r\n" .
+//        'Reply-To: emailoflvs@gmail.com' . "\r\n" .
+//        'X-Mailer: PHP/' . phpversion();
+//
+//    mail($to, $subject, $message, $headers);
+//    echo "mail sent <br>".$message;
 
-    mail($to, $subject, $message, $headers);
-    echo "mail sent <br>".$message;
-
-//    echo "status = ".$payment->status;
-//    var_dump($payment);
-//    exit;
-//    $file = 'test.txt';
-//    $current = file_get_contents($file);
-//    $current .= "Webhook:\n";
-//    $current .= $payment->status."\n";
-//    file_put_contents($file, $current);
-//exit;
     /*
-     * Update the order in the database.
-     */
-    database_write($orderId, $payment->status);
+    * Update the order in the database.
+    */
+    database_write($orderId, $payment);
 
     if ($payment->isPaid() && !$payment->hasRefunds() && !$payment->hasChargebacks()) {
         /*

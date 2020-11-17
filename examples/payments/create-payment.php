@@ -27,7 +27,7 @@ try {
     /*
      * Payment parameters:
      *   amount        Amount in EUROs. This example creates a € 10,- payment.
-     *   description   Description of the payment.
+     *   description   Description of   the payment.
      *   redirectUrl   Redirect location. The customer will be redirected there after the payment.
      *   webhookUrl    Webhook location, used to report when the payment changes state.
      *   metadata      Custom metadata that is stored with the payment.
@@ -44,7 +44,9 @@ try {
             "order_id" => $orderId,
         ],
     ]);
-
+echo "статус";
+    var_dump($payment->status);
+    exit;
     /*
      * In this example we store the order with its payment status in a database.
      */
