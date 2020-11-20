@@ -23,7 +23,8 @@ try {
      * Generate a unique order id for this example. It is important to include this unique attribute
      * in the redirectUrl (below) so a proper return page can be shown to the customer.
      */
-    $orderId = time();
+//    $orderId = time();
+    $orderId = isset($_POST['orderId'])?$_POST['orderId']:time();
 
     /*
      * Determine the url parts to these example files.
@@ -83,6 +84,28 @@ try {
      * In this example we store the order with its payment status in a database.
      */
     database_write($orderId, $payment->status);
+
+    $curl = curl_init();
+
+//    curl_setopt_array($curl, array(
+////        CURLOPT_URL => "http://bk/SimpAPI/hs/de/land/DEPay",
+//        CURLOPT_URL => "http://10.19.0.5/SimpAPI/hs/de/land/DEPay",
+//        CURLOPT_RETURNTRANSFER => true,
+//        CURLOPT_ENCODING => "",
+//        CURLOPT_MAXREDIRS => 10,
+//        CURLOPT_TIMEOUT => 0,
+//        CURLOPT_FOLLOWLOCATION => true,
+//        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+//        CURLOPT_CUSTOMREQUEST => "POST",
+//        CURLOPT_POSTFIELDS =>"{\"Order_ID\":\"".$orderId."\", \"prepayment\":\"true\", \"Paysum\":\"".$amount."\"}",
+//        CURLOPT_HTTPHEADER => array(
+//            "Content-Type: application/json"
+//        ),
+//    ));
+//
+//    $response = curl_exec($curl);
+
+    curl_close($curl);
 
     /*
      * Send the customer off to complete the payment.
