@@ -24,22 +24,20 @@
 	<body>
 		<div id="container">
 			<h2>API Form POST</h2>
-			<form method="POST" action="api/client">
+			<form method="POST" action="api/">
 				<div>
-					<label for="name">Name:</label>
-					<input type="text" name="name" id="name" placeholder="Name"/> 
+					<label for="name">Order_ID:</label>
+					<input type="text" name="order_id" id="name" value="12345" placeholder=""/>
 				</div>
 				<div>
-					<label for="age">Age:</label>
-					<input type="text" name="age" id="age" placeholder="Age"/>
+					<label for="age">prepayment:</label>
+					<input type="text" name="prepayment" id="prepayment" placeholder="" value="true"/>
 				</div>
 				<div>
-					<label for="gender">Gender:</label>
-					<select name="gender" id="gender">
-						<option value="M">Male</option>
-						<option value="F">Female</option>
-					</select>
+					<label for="age">Paysum:</label>
+					<input type="text" name="paysum" id="paysum" placeholder="" value="1"/>
 				</div>
+
 				<div>
 					<input type="submit" value="Send" name="btn"  /> 
 				</div>

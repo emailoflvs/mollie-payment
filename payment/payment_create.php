@@ -85,11 +85,12 @@ try {
      */
     database_write($orderId, $payment->status);
 
-    $curl = curl_init();
-
+//    $curl = curl_init();
 //    curl_setopt_array($curl, array(
 ////        CURLOPT_URL => "http://bk/SimpAPI/hs/de/land/DEPay",
-//        CURLOPT_URL => "http://10.19.0.5/SimpAPI/hs/de/land/DEPay",
+////        CURLOPT_URL => "http://10.19.0.5/SimpAPI/hs/de/land/DEPay",
+////        CURLOPT_URL => "http://91.205.17.233/SimpAPI/hs/de/land/DEPay",
+//        CURLOPT_URL => "http://91.205.17.233:8080/SimpAPI/hs/de/land/DEPay",
 //        CURLOPT_RETURNTRANSFER => true,
 //        CURLOPT_ENCODING => "",
 //        CURLOPT_MAXREDIRS => 10,
@@ -97,15 +98,13 @@ try {
 //        CURLOPT_FOLLOWLOCATION => true,
 //        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 //        CURLOPT_CUSTOMREQUEST => "POST",
-//        CURLOPT_POSTFIELDS =>"{\"Order_ID\":\"".$orderId."\", \"prepayment\":\"true\", \"Paysum\":\"".$amount."\"}",
+//        CURLOPT_POSTFIELDS =>"{\"Order_ID\":\"".$orderId."\", \"prepayment\":\"".$payment->status."\", \"Paysum\":\"".$amount."\"}",
 //        CURLOPT_HTTPHEADER => array(
 //            "Content-Type: application/json"
 //        ),
 //    ));
-//
 //    $response = curl_exec($curl);
-
-    curl_close($curl);
+//    curl_close($curl);
 
     /*
      * Send the customer off to complete the payment.

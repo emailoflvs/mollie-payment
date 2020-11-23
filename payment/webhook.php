@@ -27,18 +27,42 @@ try {
     $payment = $mollie->payments->get($paymentId);
     $orderId = $payment->metadata->order_id;
 
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+//        CURLOPT_URL => "http://bk/SimpAPI/hs/de/land/DEPay",
+//        CURLOPT_URL => "http://10.19.0.5/SimpAPI/hs/de/land/DEPay",
+//        CURLOPT_URL => "http://91.205.17.233/SimpAPI/hs/de/land/DEPay",
+        CURLOPT_URL => "http://91.205.17.233:8080/SimpAPI/hs/de/land/DEPay",
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "POST",
+        CURLOPT_POSTFIELDS =>"{\"Order_ID\":\"".$orderId."\", \"prepayment\":\"".$payment->status."\"}",
+
+//        CURLOPT_POSTFIELDS =>"{\"Order_ID\":\"".$orderId."\", \"prepayment\":\"".$payment->status."\",
+//                    \"Paysum\":\"".$payment->amount['value']."\"}",
+        CURLOPT_HTTPHEADER => array(
+            "Content-Type: application/json"
+        ),
+    ));
+    $response = curl_exec($curl);
+    curl_close($curl);
+
 //    //тестирование на отправке писем
-//    $to      = 'emailoflvs@gmail.com';
-////    $to      = 'vladimir@intera.dp.ua';
-//    $subject = 'hook '.$orderId;
-//    $message = 'hook '.$orderId."\r\n
-//                status:".$payment->status."\r\n".
-//        "paymentId:".$paymentId;
-//    $headers = 'From: emailoflvs@gmail.com' . "\r\n" .
-//        'Reply-To: emailoflvs@gmail.com' . "\r\n" .
-//        'X-Mailer: PHP/' . phpversion();
-//
-//    mail($to, $subject, $message, $headers);
+    $to      = 'emailoflvs@gmail.com';
+    $subject = 'hook '.$orderId;
+    $message = 'hook '.$orderId."\r\n
+                status:".$payment->status."\r\n".
+        "paymentId:".$paymentId."\r\n".
+    "response:".$response."\r\n";
+    $headers = 'From: emailoflvs@gmail.com' . "\r\n" .
+        'Reply-To: emailoflvs@gmail.com' . "\r\n" .
+        'X-Mailer: PHP/' . phpversion();
+
+    mail($to, $subject, $message, $headers);
 //    echo "mail sent <br>".$message;
 
     /*
@@ -82,6 +106,8 @@ try {
          * The status of the payment is still "paid"
          */
     }
+
+
 } catch (\Mollie\Api\Exceptions\ApiException $e) {
     echo "API call failed: " . htmlspecialchars($e->getMessage());
 }
