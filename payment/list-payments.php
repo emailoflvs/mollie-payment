@@ -1,3 +1,6 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+<title>Payments list</title></head>
+<a href="index.php">Сделать платеж</a><br><br>
 <?php
 /*
  * How to list your payments.

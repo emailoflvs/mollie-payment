@@ -1,10 +1,11 @@
-<h4>удаленный адрес папки ftp://ftp.www.prizeme.de@195.123.217.33/mollie/payment</h4>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+    <title>Make payment</title></head>
 <form action="payment_create.php" method="post">
 <input type="text" value="0.01" name="amount" width="5px;"> Euro
     <br><br><input type="submit" value="Оплатить">
 </form>
 <br><br>
-<a href="list-payments.php">Список платежей</a>
+<a href="list-payments.php" target="_blank">Список платежей</a>
 <?php
 //echo $_SERVER['SERVER_ADDR'];
 //test ip ping
