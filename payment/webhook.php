@@ -23,6 +23,8 @@ try {
     $paymentId = $_POST["id"];
 //    $paymentId = "tr_Dn59RPJHCK";
 
+//    echo $paymentId;
+//    exit;
     //    $payment = $mollie->payments->get($_POST["id"]);
     $payment = $mollie->payments->get($paymentId);
     $orderId = $payment->metadata->order_id;
@@ -32,7 +34,7 @@ try {
 //        CURLOPT_URL => "http://bk/SimpAPI/hs/de/land/DEPay",
 //        CURLOPT_URL => "http://10.19.0.5/SimpAPI/hs/de/land/DEPay",
 //        CURLOPT_URL => "http://91.205.17.233/SimpAPI/hs/de/land/DEPay",
-        CURLOPT_URL => "http://91.205.17.233:8080/SimpAPI/hs/de/land/DEPay",
+        CURLOPT_URL => "http://91.205.17.233:8088/SimpAPI/hs/de/land/DEPay",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,

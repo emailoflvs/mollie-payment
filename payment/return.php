@@ -14,6 +14,9 @@ require_once "../vendor/autoload.php";
 require_once "functions.php";
 require_once "initialize.php";
 
+//var_dump($_GET);
+//var_dump($_POST);
+//exit;
 $payment = database_read($_GET["order_id"]);
 
 /*

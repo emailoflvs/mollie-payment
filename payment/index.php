@@ -1,6 +1,4 @@
-<!--<h4>удаленный адрес папки ftp://ftp.www.prizeme.de@195.123.217.33/wp-content</h4>-->
 <h4>удаленный адрес папки ftp://ftp.www.prizeme.de@195.123.217.33/mollie/payment</h4>
-<!--<h4>удаленный адрес папки ftp://ftp.www.prizeme.de@195.123.217.33/wp-content/mollie/payment</h4>-->
 <form action="payment_create.php" method="post">
 <input type="text" value="0.01" name="amount" width="5px;"> Euro
     <br><br><input type="submit" value="Оплатить">
