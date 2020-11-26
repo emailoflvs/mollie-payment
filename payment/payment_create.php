@@ -19,7 +19,11 @@ try {
      * Generate a unique order id for this example. It is important to include this unique attribute
      * in the redirectUrl (below) so a proper return page can be shown to the customer.
      */
-    $orderId = isset($_POST['orderId']) ? $_POST['orderId'] : time();
+//    var_dump($_POST);
+//    var_dump($_GET);
+//    exit;
+    $orderId = isset($_POST['orderId']) ? $_POST['orderId'] : 0;
+    $orderId = (!$orderId && isset($_GET['orderId'])) ? $_GET['orderId'] : time();
 
     /*
      * Determine the url parts to these example files.
@@ -29,14 +33,18 @@ try {
     $path = dirname(isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['PHP_SELF']);
 
     /*
-     * Payment parameters:
+     * Payme(nt parameters:
      *   amount        Amount in EUROs. This example creates a € 10,- payment.
      *   description   Description of the payment.
      *   redirectUrl   Redirect location. The customer will be redirected there after the payment.
      *   webhookUrl    Webhook location, used to report when the payment changes state.
      *   metadata      Custom metadata that is stored with the payment.
      */
-    $amount = isset($_POST['amount']) ? $_POST['amount'] : "0.01";
+    $amount = isset($_POST['amount']) ? $_POST['amount'] : "0";
+    $amount = (!$amount && isset($_GET['amount'])) ? $_GET['amount'] : "0.01";
+
+    //mollie в тестовом режиме не поддерживает сумму больше 0.09
+    $amount = ((int)$amount > 0.09) ? "0.09" : $amount;
 
     $paymentForm = [
         "amount" => [
@@ -44,8 +52,10 @@ try {
             "value" => $amount // You must send the correct number of decimals, thus we enforce the use of strings
         ],
         "description" => "Order #{$orderId}",
-//        "testmode" => "true",
-        "redirectUrl" => "{$protocol}://{$hostname}{$path}/return.php?order_id={$orderId}",
+//        "mode" => "test",
+//        "redirectUrl" => "{$protocol}://{$hostname}{$path}/return.php?order_id={$orderId}",
+        "redirectUrl" => "https://prizeme.de/mollie/payment/return.php?order_id={$orderId}",
+        "redirectUrl" => "https://prizeme.de/confirmed-payment/?order_id={$orderId}",
         "webhookUrl" => "{$protocol}://{$hostname}{$path}/webhook.php",
         "metadata" => [
             "order_id" => $orderId,

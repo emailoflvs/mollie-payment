@@ -1,7 +1,13 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
     <title>Make payment</title></head>
-<form action="payment_create.php" method="post">
-<input type="text" value="0.01" name="amount" width="5px;"> Euro
+<!--<form action="payment_create.php" method="post">-->
+<form action="https://prizeme.de/mollie/payment_create.php" method="get">
+    <!--<form action="https://prizeme.de/mollie-test-2/" method="get">-->
+
+    <input type="text" value="0.01" name="amount" width="5px;"> Euro
     <br><br><input type="submit" value="Оплатить">
 </form>
 <br><br>

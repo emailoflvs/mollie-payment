@@ -1,5 +1,3 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
-<title>Return from payment</title></head>
 <?php
 /*
  * How to show a return page to the customer.
@@ -32,8 +30,16 @@ if (is_null($payment['mollie_payment_id'])) {
 
 $payment = $mollie->payments->get($payment['mollie_payment_id']);
 
-//var_dump($payment);
-echo "<p>Стастус платежа для заказа ".$_GET["order_id"]." '" . htmlspecialchars($payment->status) . "'.</p>";
+$paymentResult = [
+    'order_id' => $_GET["order_id"],
+    'status' => $payment->status,
+];
+
+$paymentResult = json_encode($paymentResult);
+echo $paymentResult;
+exit;
+
+echo "<p>Стастус платежа для заказа " . $_GET["order_id"] . " '" . htmlspecialchars($payment->status) . "'.</p>";
 echo "<p>";
 //echo '<a href="' . $protocol . '://' . $hostname . $path . '/index.php">Сделать платеж</a><br><br>';
 //echo '<a href="' . $protocol . '://' . $hostname . $path . '/list-payments.php">Список платежей</a><br>';
