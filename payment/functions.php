@@ -53,8 +53,12 @@ function database_write($orderId, $payment)
     if (empty($rows)) {
         $query = "INSERT INTO `payments`(`id`, `mollie_payment_id`, `order_id`, `mode`, `currency`, `value`, 
         `description`, `method`, `status`, `created_at`, `paid_at`, `canceled_at`, `expires_at`, `failed_at`) 
-        VALUES (NULL,NULL,'" . $orderId . "',NULL,NULL,NULL,NULL,NULL,'open',NULL,NULL,NULL,NULL,NULL)";
-
+        VALUES (NULL,'" . $payment->id . "','" . $orderId . "','" . $payment->mode . "','" .
+            $payment->amount->currency . "','" . $payment->amount->value . "','" . $payment->description .
+            "','" . $payment->method . "','" . $payment->status . "','" . $payment->createdAt .
+            "','" . $payment->paidAt . "','" . $payment->canceledAt . "','" . $payment->expiresAt . "','"
+            . $payment->failedAt . "')";
+        echo $query;
         $result = mysqli_query($link, $query) or die(mysqli_error($link));
 
     } else {

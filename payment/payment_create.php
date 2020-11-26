@@ -42,9 +42,8 @@ try {
      */
     $amount = isset($_POST['amount']) ? $_POST['amount'] : "0";
     $amount = (!$amount && isset($_GET['amount'])) ? $_GET['amount'] : "0.01";
-
-    //mollie в тестовом режиме не поддерживает сумму больше 0.09
-    $amount = ((int)$amount > 0.09) ? "0.09" : $amount;
+    //обязательный формат .00
+    $amount = number_format($amount, 2, '.', '');
 
     $paymentForm = [
         "amount" => [
@@ -67,7 +66,8 @@ try {
     /*
      * In this example we store the order with its payment status in a database.
      */
-    database_write($orderId, $payment->status);
+//    database_write($orderId, $payment->status);
+    database_write($orderId, $payment);
 
     /*
      * Send the customer off to complete the payment.
