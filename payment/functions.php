@@ -108,6 +108,11 @@ function timeConverting ($time){
 
 function sendTo1C($formTo1C, $purpose = "DEOrder")
 {
+//        CURLOPT_URL => "http://bk/SimpAPI/hs/de/land/DEPay",
+//        CURLOPT_URL => "http://10.19.0.5/SimpAPI/hs/de/land/DEPay",
+//        CURLOPT_URL => "http://91.205.17.233/SimpAPI/hs/de/land/DEPay",
+//        CURLOPT_POSTFIELDS =>"{\"Order_ID\":\"".$orderId."\", \"prepayment\":\"".$payment->status."\",
+//                    \"Paysum\":\"".$payment->amount['value']."\"}",
 
     //purpose - назначение отправки данных, DEPay - об оплате, DEOrder - добавление заказа
     $url1C = "http://91.205.17.233:8088/SimpAPI/hs/de/land/";
@@ -115,26 +120,21 @@ function sendTo1C($formTo1C, $purpose = "DEOrder")
 
     $curl = curl_init();
     curl_setopt_array($curl, [
-//        CURLOPT_URL => "http://bk/SimpAPI/hs/de/land/DEPay",
-//        CURLOPT_URL => "http://10.19.0.5/SimpAPI/hs/de/land/DEPay",
-//        CURLOPT_URL => "http://91.205.17.233/SimpAPI/hs/de/land/DEPay",
         CURLOPT_URL => $url,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
+        CURLOPT_TIMEOUT => 5,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => "POST",
         CURLOPT_POSTFIELDS => $formTo1C,
-
-//        CURLOPT_POSTFIELDS =>"{\"Order_ID\":\"".$orderId."\", \"prepayment\":\"".$payment->status."\",
-//                    \"Paysum\":\"".$payment->amount['value']."\"}",
         CURLOPT_HTTPHEADER => [
             "Content-Type: application/json"
         ]
     ]);
     $response = curl_exec($curl);
     curl_close($curl);
+
     return $response;
 }

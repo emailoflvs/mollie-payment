@@ -29,28 +29,29 @@ try {
     $payment = $mollie->payments->get($paymentId);
     $orderId = $payment->metadata->order_id;
 
-    $form1C = '{"Order_ID":"' . $orderId . '", "prepayment":"true", "Paysum":"' . $payment->amount->value . '",
-    "status":"' . $payment->status . '"}';
-
 //    //тестирование на отправке писем
-    $to = 'emailoflvs@gmail.com';
-    $subject = 'hook ' . $orderId;
-    $message = 'hook ' . $orderId . "\r\n
-                status:" . $payment->status . "\r\n" .
-        "paymentId:" . $paymentId . "\r\n" .
-        "response:" . $response . "\r\n";
-    $headers = 'From: emailoflvs@gmail.com' . "\r\n" .
-        'Reply-To: emailoflvs@gmail.com' . "\r\n" .
-        'X-Mailer: PHP/' . phpversion();
-
-    mail($to, $subject, $message, $headers);
+//    $to = 'emailoflvs@gmail.com';
+//    $subject = 'hook ' . $orderId;
+//    $message = 'hook ' . $orderId . "\r\n
+//                status:" . $payment->status . "\r\n" .
+//        "paymentId:" . $paymentId . "\r\n" .
+//        "response:" . $response . "\r\n";
+//    $headers = 'From: emailoflvs@gmail.com' . "\r\n" .
+//        'Reply-To: emailoflvs@gmail.com' . "\r\n" .
+//        'X-Mailer: PHP/' . phpversion();
+//
+//    mail($to, $subject, $message, $headers);
 
     /*
     * Update the order in the database.
     */
     database_write($orderId, $payment);
 
-    sendTo1C($form1C);
+    $form1C = '{"Order_ID":"' . $orderId . '", "prepayment":"true", "Paysum":"' . $payment->amount->value . '",
+    "status":"' . $payment->status . '"}';
+
+    //уведоиление о статусе оплаты
+    sendTo1C($form1C, "DEPay");
 
     if ($payment->isPaid() && !$payment->hasRefunds() && !$payment->hasChargebacks()) {
         /*

@@ -4,16 +4,12 @@
     <meta charset="utf-8"/>
     <title>Make payment</title></head>
 <!--<form action="payment_create.php" method="post">-->
-<form action="https://prizeme.de/mollie/payment/payment_create.php" method="get">
+<form action="https://prizeme.de/mollie/payment/payment_create.php" method="post">
     <!--<form action="https://prizeme.de/mollie-test-2/" method="get">-->
-
 
     <input type="text" value="0.01" name="amount" width="5px;"> Euro
     <!--    <br><input type="radio" name="method" value="paypal">paypal-->
-
-
     <?
-
     try {
         /*
          * Initialize the Mollie API library with your API key.

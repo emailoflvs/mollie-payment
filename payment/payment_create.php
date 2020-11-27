@@ -22,18 +22,16 @@ try {
 //    var_dump($_POST);
 //    var_dump($_GET);
 //    exit;
-    $orderId = isset($_POST['orderId']) ? $_POST['orderId'] : 0;
-    $orderId = (!$orderId && isset($_GET['orderId'])) ? $_GET['orderId'] : time();
+    $formData = $_POST;
 
-    var_dump($_POST);
-//    var_dump($_GET);
-    exit;
     /*
      * Determine the url parts to these example files.
      */
     $protocol = isset($_SERVER['HTTPS']) && strcasecmp('off', $_SERVER['HTTPS']) !== 0 ? "https" : "http";
     $hostname = $_SERVER['HTTP_HOST'];
     $path = dirname(isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['PHP_SELF']);
+    $url = $protocol . "://" . $hostname . $_SERVER['PHP_SELF'];
+
 
     /*
      * Payme(nt parameters:
@@ -43,29 +41,56 @@ try {
      *   webhookUrl    Webhook location, used to report when the payment changes state.
      *   metadata      Custom metadata that is stored with the payment.
      */
-    $amount = isset($_POST['amount']) ? $_POST['amount'] : "0";
-    $amount = (!$amount && isset($_GET['amount'])) ? $_GET['amount'] : "0.01";
-    //обязательный формат .00
-    $amount = number_format($amount, 2, '.', '');
+//    $amount = isset($_POST['amount']) ? $_POST['amount'] : "0";
+//    $amount = (!$amount && isset($_GET['amount'])) ? $_GET['amount'] : "0.01";
 
-    $method = isset($_GET['method']) ? $_GET['method'] : "";
-//    var_dump();
+    //обязательный формат .00
+    $amount = number_format($formData['amount'], 2, '.', '');
+    $order_id = $formData['order_id'];
+    $method = isset($_formData['method']) ? $_formData['method'] : "";
+
+//    "Order_ID":"' . $orderId . '", "prepayment":"true", "Paysum":"' . $payment->amount->value . '",
+//    "status":"' . $payment->status . '"
+
+    $form1C = '{"Order_ID":"' . $order_id . '", "prepayment":"true", "Paysum":"' . $amount . '",
+    "status":"open", "name":"' . $formData["your-firstname"] . '","lastname":"' . $formData["your-lastname"] .
+        '", "phone":"' . $formData["your-phone"] . '", "billing_street":"' . $formData["billing_street"] .
+        '", "billing_housenumber":"' . $formData["billing_housenumber"] . '","billing_postcode":"'
+        . $formData["billing_postcode"] . '", "billing_city":"' . $formData["billing_city"] . '", "email":"' .
+        $formData["your-email"] . '","type":"' . $formData["type"] . '","lead_id":"' . $formData["lead-id"] . '",
+    "goods": ' . json_encode($formData["your-product"]) . ', "utm_campaign":null,"utm_content":null,"utm_medium":null,
+    "utm_source":null,"utm_term":null, "url":"https:\/\/' . $hostname . '\/' . $hostname . '\/","IP_client":null}';
+
+//    {"utm_campaign":null,"utm_content":null,"utm_medium":null,"utm_source":null,"utm_term":null,
+//        "url":"https:\/\/prizeme.de\/mollie-test-2\/","IP_client":"172.68.239.105",
+//"name":"Sobachiy","lastname":"hren","phone":"493 8067 5449","billing_street":"gfdgdf","billing_housenumber":"12",
+//"billing_postcode":"04852","billing_city":"32323",
+//"email":"","type":"1","lead_id":"000000020","goods":["00-00000093"]}
+//    { "_wpcf7":"612","_wpcf7_version":"5.3","_wpcf7_locale":"ru_RU","_wpcf7_unit_tag":"wpcf7-f612-o1","_wpcf7_container_post":"0","_wpcf7_posted_data_hash":"","order_id":"2734852186","your-firstname":"","your-lastname":"","your-phone":"","billing_street":"","billing_housenumber":"","billing_postcode":"","billing_city":"","your-email":"","type":"1","lead-id":"000000020","form-product_qty":"0","your-product":["*00-00000093* Set \u00abHausapotheke\u00bb"],"amount":"55.80"
+//    }
+
+    //отправка данных о заказе
+    $response = sendTo1C($form1C, "DEOrder");
+
+//    var_dump($response);
+//    var_dump($form1C);
 //    exit;
+
     $paymentForm = [
         "amount" => [
             "currency" => "EUR",
             "value" => $amount // You must send the correct number of decimals, thus we enforce the use of strings
         ],
-        "description" => "Order #{$orderId}",
+        "description" => "Order #{$order_id}",
         "method" => $method,
 
 //        "mode" => "test",
-//        "redirectUrl" => "{$protocol}://{$hostname}{$path}/return.php?order_id={$orderId}",
-        "redirectUrl" => "https://prizeme.de/mollie/payment/return.php?order_id={$orderId}",
-        "redirectUrl" => "https://prizeme.de/confirmed-payment/?order_id={$orderId}",
+//        "redirectUrl" => "{$protocol}://{$hostname}{$path}/return.php?order_id={$order_id}",
+        "redirectUrl" => "https://prizeme.de/mollie/payment/return.php?order_id={$order_id}",
+        "redirectUrl" => "https://prizeme.de/confirmed-payment/?order_id={$order_id}",
         "webhookUrl" => "{$protocol}://{$hostname}{$path}/webhook.php",
         "metadata" => [
-            "order_id" => $orderId,
+            "order_id" => $order_id,
         ],
     ];
 
@@ -76,8 +101,8 @@ try {
     /*
      * In this example we store the order with its payment status in a database.
      */
-//    database_write($orderId, $payment->status);
-    database_write($orderId, $payment);
+//    database_write($order_id, $payment->status);
+    database_write($order_id, $payment);
 
     /*
      * Send the customer off to complete the payment.
