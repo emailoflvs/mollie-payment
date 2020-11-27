@@ -1,4 +1,7 @@
 <?php
+//ini_set('error_reporting', E_ALL);
+//ini_set('display_errors', 1);
+//ini_set('display_startup_errors', 1);
 
 require_once "../vendor/autoload.php";
 require_once "functions.php";
@@ -71,10 +74,12 @@ try {
 
     //отправка данных о заказе
     $response = sendTo1C($form1C, "DEOrder");
+//    $response_error = sendTo1C('{"error":"1"', "DEOrder");
 
-//    var_dump($response);
-//    var_dump($form1C);
-//    exit;
+    if ($response != 200) {
+        echo "Ошибка отправки данных в 1С";
+        exit;
+    }
 
     $paymentForm = [
         "amount" => [
@@ -83,8 +88,6 @@ try {
         ],
         "description" => "Order #{$order_id}",
         "method" => $method,
-
-//        "mode" => "test",
 //        "redirectUrl" => "{$protocol}://{$hostname}{$path}/return.php?order_id={$order_id}",
         "redirectUrl" => "https://prizeme.de/mollie/payment/return.php?order_id={$order_id}",
         "redirectUrl" => "https://prizeme.de/confirmed-payment/?order_id={$order_id}",
