@@ -25,6 +25,9 @@ try {
     $orderId = isset($_POST['orderId']) ? $_POST['orderId'] : 0;
     $orderId = (!$orderId && isset($_GET['orderId'])) ? $_GET['orderId'] : time();
 
+    var_dump($_POST);
+//    var_dump($_GET);
+    exit;
     /*
      * Determine the url parts to these example files.
      */
@@ -45,12 +48,17 @@ try {
     //обязательный формат .00
     $amount = number_format($amount, 2, '.', '');
 
+    $method = isset($_GET['method']) ? $_GET['method'] : "";
+//    var_dump();
+//    exit;
     $paymentForm = [
         "amount" => [
             "currency" => "EUR",
             "value" => $amount // You must send the correct number of decimals, thus we enforce the use of strings
         ],
         "description" => "Order #{$orderId}",
+        "method" => $method,
+
 //        "mode" => "test",
 //        "redirectUrl" => "{$protocol}://{$hostname}{$path}/return.php?order_id={$orderId}",
         "redirectUrl" => "https://prizeme.de/mollie/payment/return.php?order_id={$orderId}",
@@ -61,6 +69,8 @@ try {
         ],
     ];
 
+//    var_dump($paymentForm);
+//    exit;
     $payment = $mollie->payments->create($paymentForm);
 
     /*
