@@ -7,15 +7,18 @@ require_once "../../wp-config.php";
 
 function database_connection()
 {
-        // Соединяемся, выбираем базу данных
+    // Соединяемся, выбираем базу данных
 //    $host = "195.123.217.33";
-//    $host = "localhost";
+////    $host = "localhost";
 //    $user = "prizeme.de";
+////    $user = "test";
 //    $password = "1Q7j0B3s";
-//    $dbName = "prizeme.de";
+////    $dbName = "prizeme.de";
+//    $dbName = "test";
 
     //Соединяемся с базой данных используя наши доступы:
     $link = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+//    $link = mysqli_connect($host, $user, $password, $dbName);
     mysqli_query($link, "SET NAMES 'utf8'");
 
     return $link;
@@ -28,15 +31,25 @@ function database_read($orderId)
     $link = database_connection();
 
     // Проверяем, есть ли уже запись с order_id
-    $query = "SELECT * FROM `prizeme.de`.`payments` where `order_id`=" . $orderId;
+//    $query = "SELECT * FROM `prizeme.de`.`payments` where `order_id`=" . $orderId;
+//    $query = "SELECT * FROM `prizeme.de`.`payments` where `description` like `Order #" . $orderId . "`";
+    $query = "SELECT * FROM `payments` WHERE `description` LIKE 'Order #" . $orderId . "'";
+
+//    var_dump($query);
+//    exit;
     $result = mysqli_query($link, $query) or die(mysqli_error($link));
 
     $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
-
+//var_dump($rows[0]);
     if (empty($rows))
         return "unknown order";
-    else
+    else {
         return $rows[0];
+        $result = explode("#", $rows[0]);
+        $result = $result [1];
+        return $result;
+    }
+
 }
 
 function database_write($orderId, $payment)
@@ -58,13 +71,13 @@ function database_write($orderId, $payment)
             "','" . $payment->method . "','" . $payment->status . "','" . $payment->createdAt .
             "','" . $payment->paidAt . "','" . $payment->canceledAt . "','" . $payment->expiresAt . "','"
             . $payment->failedAt . "')";
-        echo $query;
+//        echo $query;
         $result = mysqli_query($link, $query) or die(mysqli_error($link));
 
     } else {
 
         $query = "UPDATE `prizeme.de`.`payments` SET 
-        `mollie_payment_id` = '".$payment->id . "', 
+        `mollie_payment_id` = '" . $payment->id . "', 
         `status` = '" . $payment->status . "', 
         `mode` = '" . $payment->mode . "', 
         `currency` = '" . $payment->amount->currency . "', 
@@ -93,9 +106,11 @@ function database_write($orderId, $payment)
         $result = mysqli_query($link, $query) or die(mysqli_error($link));
 
     }
+//    exit;
 }
 
-function timeConverting ($time){
+function timeConverting($time)
+{
 
     if (is_null($time))
         return "";
@@ -114,7 +129,7 @@ function sendTo1C($formTo1C, $purpose = "DEOrder")
 //        CURLOPT_POSTFIELDS =>"{\"Order_ID\":\"".$orderId."\", \"prepayment\":\"".$payment->status."\",
 //                    \"Paysum\":\"".$payment->amount['value']."\"}",
 
-    //purpose - назначение отправки данных, DEPay - об оплате, DEOrder - добавление заказа
+    //purpose - назначение отправки данных
     $url1C = "http://91.205.17.233:8088/SimpAPI/hs/de/land/";
     $url = $url1C . $purpose;
 
@@ -134,7 +149,13 @@ function sendTo1C($formTo1C, $purpose = "DEOrder")
         ]
     ]);
     $response = curl_exec($curl);
+    $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
     curl_close($curl);
 
+    //возвращает ответ 1С
+//    return $httpcode;
+
+    //возвращает ответ 1С после проверки на необходимые данные
     return $response;
 }

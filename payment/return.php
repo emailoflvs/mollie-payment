@@ -14,13 +14,17 @@ require_once "../vendor/autoload.php";
 require_once "functions.php";
 require_once "initialize.php";
 
-
+//echo "dd";
 $payment = database_read($_GET["order_id"]);
 
-if (is_null($payment['mollie_payment_id'])) {
+//var_dump($payment);
+//exit;
+if (!isset($payment['mollie_payment_id']) || !strstr($payment['mollie_payment_id'], "tr_")) {
     echo "Для данного заказа не создан id платежа";
     exit;
 }
+//var_dump($payment);
+//exit;
 ///*
 // * Determine the url parts to these example files.
 // */
@@ -30,6 +34,9 @@ if (is_null($payment['mollie_payment_id'])) {
 
 $payment = $mollie->payments->get($payment['mollie_payment_id']);
 
+if (strstr($payment->status, "paid"))
+    echo "paid";
+exit;
 $paymentResult = [
     'order_id' => $_GET["order_id"],
     'status' => $payment->status,

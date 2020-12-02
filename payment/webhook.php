@@ -47,11 +47,19 @@ try {
     */
     database_write($orderId, $payment);
 
-    $form1C = '{"Order_ID":"' . $orderId . '", "prepayment":"true", "Paysum":"' . $payment->amount->value . '",
+    $form1C = '{"payment_id":"' . $payment->id . '","Order_ID":"' . $orderId . '", "prepayment":"true", "Paysum":"' . $payment->amount->value . '",
     "status":"' . $payment->status . '"}';
 
-    //уведоиление о статусе оплаты
-    sendTo1C($form1C, "DEPay");
+    //отправка любых полученихуведомлений Mollie
+    sendTo1C($form1C, "DE-ChangePaymentStatus");
+
+    //уведоиление при получении статуса "PAID"
+    if (strstr($payment->status, "paid"))
+        sendTo1C($form1C, "DE-SetPaid");
+
+    //уведоиление при получении статуса "CANCELED"
+    if (strstr($payment->status, "canceled"))
+        sendTo1C($form1C, "DE-SetCanceled");
 
     if ($payment->isPaid() && !$payment->hasRefunds() && !$payment->hasChargebacks()) {
         /*

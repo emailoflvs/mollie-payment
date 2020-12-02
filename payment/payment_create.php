@@ -50,18 +50,27 @@ try {
     //обязательный формат .00
     $amount = number_format($formData['amount'], 2, '.', '');
     $order_id = $formData['order_id'];
-    $method = isset($_formData['method']) ? $_formData['method'] : "";
+    $method = isset($formData['method']) ? $formData['method'] : "";
 
 //    "Order_ID":"' . $orderId . '", "prepayment":"true", "Paysum":"' . $payment->amount->value . '",
 //    "status":"' . $payment->status . '"
 
-    $form1C = '{"Order_ID":"' . $order_id . '", "prepayment":"true", "Paysum":"' . $amount . '",
+    $goods = [];
+    foreach ($formData["your-product"] as $product) {
+        $product = explode("*", $product);
+        $goods[] = $product[1];
+    }
+//    var_dump($goods);
+//    var_dump($formData["your-product"]);
+//    exit;
+
+    $form1C = '{"Order_ID":"' . $order_id . '", "prepayment":"true", "Paysum":"0",
     "status":"open", "name":"' . $formData["your-firstname"] . '","lastname":"' . $formData["your-lastname"] .
         '", "phone":"' . $formData["your-phone"] . '", "billing_street":"' . $formData["billing_street"] .
         '", "billing_housenumber":"' . $formData["billing_housenumber"] . '","billing_postcode":"'
         . $formData["billing_postcode"] . '", "billing_city":"' . $formData["billing_city"] . '", "email":"' .
         $formData["your-email"] . '","type":"' . $formData["type"] . '","lead_id":"' . $formData["lead-id"] . '",
-    "goods": ' . json_encode($formData["your-product"]) . ', "utm_campaign":null,"utm_content":null,"utm_medium":null,
+    "goods": ' . json_encode($goods) . ', "utm_campaign":null,"utm_content":null,"utm_medium":null,
     "utm_source":null,"utm_term":null, "url":"https:\/\/' . $hostname . '\/' . $hostname . '\/","IP_client":null}';
 
 //    {"utm_campaign":null,"utm_content":null,"utm_medium":null,"utm_source":null,"utm_term":null,
@@ -72,12 +81,20 @@ try {
 //    { "_wpcf7":"612","_wpcf7_version":"5.3","_wpcf7_locale":"ru_RU","_wpcf7_unit_tag":"wpcf7-f612-o1","_wpcf7_container_post":"0","_wpcf7_posted_data_hash":"","order_id":"2734852186","your-firstname":"","your-lastname":"","your-phone":"","billing_street":"","billing_housenumber":"","billing_postcode":"","billing_city":"","your-email":"","type":"1","lead-id":"000000020","form-product_qty":"0","your-product":["*00-00000093* Set \u00abHausapotheke\u00bb"],"amount":"55.80"
 //    }
 
-    //отправка данных о заказе
-    $response = sendTo1C($form1C, "DEOrder");
+//        var_dump($form1C);
+//    exit;
+
+    //Первая отправка данных о заказе
+    $response = sendTo1C($form1C, "DE-MakeOrder");
+
+//    var_dump($response);
+//    exit;
+    //    $response = sendTo1C($form1C, "DEOrder");
 //    $response_error = sendTo1C('{"error":"1"', "DEOrder");
 
+    //если данные не загрузились в 1С, то возвращаем ошибку не открывая систему оплаты
     if ($response != 200) {
-        echo "Ошибка отправки данных в 1С";
+        echo "Ошибка отправки данных в 1С (error " . $response . ")";
         exit;
     }
 
@@ -86,10 +103,10 @@ try {
             "currency" => "EUR",
             "value" => $amount // You must send the correct number of decimals, thus we enforce the use of strings
         ],
-        "description" => "Order #{$order_id}",
+        "description" => "Order #" . $order_id,
         "method" => $method,
 //        "redirectUrl" => "{$protocol}://{$hostname}{$path}/return.php?order_id={$order_id}",
-        "redirectUrl" => "https://prizeme.de/mollie/payment/return.php?order_id={$order_id}",
+//        "redirectUrl" => "https://prizeme.de/mollie/payment/return.php?order_id=".$order_id,
         "redirectUrl" => "https://prizeme.de/confirmed-payment/?order_id={$order_id}",
         "webhookUrl" => "{$protocol}://{$hostname}{$path}/webhook.php",
         "metadata" => [
@@ -97,9 +114,16 @@ try {
         ],
     ];
 
-//    var_dump($paymentForm);
-//    exit;
     $payment = $mollie->payments->create($paymentForm);
+
+    $form1C = '{"payment_id":"' . $payment->id . '","Order_ID":"' . $order_id . '", "prepayment":"true", "Paysum":"' . $payment->amount->value . '",
+    "status":"' . $payment->status . '"}';
+
+    //отправка данных о заказе,  послезапуска Mollie
+//    $response = sendTo1C($form1C, "DE-MakeOrder");
+
+    //отправка любых полученых уведомлений Mollie
+    sendTo1C($form1C, "DE-ChangePaymentStatus");
 
     /*
      * In this example we store the order with its payment status in a database.

@@ -23,8 +23,8 @@ $mollie = new \Mollie\Api\MollieApiClient();
 //Test API key = test_y3e3j5UR3upkHrgjhtW9vQ6Hj7hkw5
 $mollie->setApiKey("test_y3e3j5UR3upkHrgjhtW9vQ6Hj7hkw5");
 
-//Partner ID = 8776021
-//Profile ID = pfl_A9ucg8gmT3
+//Partner ID = '8776021';
+//Profile ID = 'pfl_A9ucg8gmT3';
 //api немецкого аккаунта
 
 # swap was on /dev/sda6 during installation
