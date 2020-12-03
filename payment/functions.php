@@ -139,7 +139,7 @@ function sendTo1C($formTo1C, $purpose = "DEOrder")
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 5,
+        CURLOPT_TIMEOUT => 10,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => "POST",
@@ -148,14 +148,14 @@ function sendTo1C($formTo1C, $purpose = "DEOrder")
             "Content-Type: application/json"
         ]
     ]);
+
+    //ответ 1С о добавлении данных
     $response = curl_exec($curl);
-    $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+    //информация о проделанной операции
+    $httpcode = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
 
     curl_close($curl);
 
-    //возвращает ответ 1С
-//    return $httpcode;
-
-    //возвращает ответ 1С после проверки на необходимые данные
-    return $response;
+    return $httpcode;
 }

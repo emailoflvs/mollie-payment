@@ -34,8 +34,17 @@ try {
     $hostname = $_SERVER['HTTP_HOST'];
     $path = dirname(isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['PHP_SELF']);
     $url = $protocol . "://" . $hostname . $_SERVER['PHP_SELF'];
+//var_dump($_POST);
+    session_start();
+    $_SESSION['HTTP_REFERER'] = $_SERVER['HTTP_REFERER'];
 
+//    var_dump($_COOKIE);
+//    var_dump($_SERVER);
+//    var_dump($_SESSION);
+//    var_dump($HTTP_SESSION_VARS);
+//    session_destroy();
 
+//exit;
     /*
      * Payme(nt parameters:
      *   amount        Amount in EUROs. This example creates a € 10,- payment.
@@ -49,6 +58,7 @@ try {
 
     //обязательный формат .00
     $amount = number_format($formData['amount'], 2, '.', '');
+//    $amount = number_format(0.01 , 2, '.', '');
     $order_id = $formData['order_id'];
     $method = isset($formData['method']) ? $formData['method'] : "";
 

@@ -34,8 +34,26 @@ if (!isset($payment['mollie_payment_id']) || !strstr($payment['mollie_payment_id
 
 $payment = $mollie->payments->get($payment['mollie_payment_id']);
 
-if (strstr($payment->status, "paid"))
-    echo "paid";
+//echo $payment->status;
+session_start();
+$paymentResult = [
+    'order_id' => $_GET["order_id"],
+    'status' => $payment->status,
+    'return_href' => $_SESSION["HTTP_REFERER"],
+//    'payment_href' => 'payment_create.php?payment_id='.$payment->id,
+];
+
+$paymentResult = json_encode($paymentResult);
+echo $paymentResult;
+
+//echo "<br><a href='". $_SESSION["HTTP_REFERER"]."'>Вернуться на страницу заказа </a>";
+//echo "<br><a href='". $_SESSION["HTTP_REFERER"]."'>Вернуться на страницу оплаты </a>";
+
+//var_dump($paymentResult);
+//var_dump($_SESSION);
+//session_destroy();
+//if (strstr($payment->status, "paid"))
+//    echo "paid";
 exit;
 $paymentResult = [
     'order_id' => $_GET["order_id"],
