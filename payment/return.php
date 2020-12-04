@@ -14,20 +14,15 @@ require_once "../vendor/autoload.php";
 require_once "functions.php";
 require_once "initialize.php";
 
-//echo "dd";
 $payment = database_read($_GET["order_id"]);
 
-//var_dump($payment);
-//exit;
 if (!isset($payment['mollie_payment_id']) || !strstr($payment['mollie_payment_id'], "tr_")) {
     echo "Для данного заказа не создан id платежа";
     exit;
 }
-//var_dump($payment);
-//exit;
-///*
-// * Determine the url parts to these example files.
-// */
+/*
+ * Determine the url parts to these example files.
+ */
 //$protocol = isset($_SERVER['HTTPS']) && strcasecmp('off', $_SERVER['HTTPS']) !== 0 ? "https" : "http";
 //$hostname = $_SERVER['HTTP_HOST'];
 //$path = dirname(isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['PHP_SELF']);
@@ -39,8 +34,9 @@ session_start();
 $paymentResult = [
     'order_id' => $_GET["order_id"],
     'status' => $payment->status,
+//    'return_href' => $_SESSION["HTTP_REFERER"]?$_SESSION["HTTP_REFERER"]:"/",
     'return_href' => $_SESSION["HTTP_REFERER"],
-//    'payment_href' => 'payment_create.php?payment_id='.$payment->id,
+    'payment_href' => 'payment_create.php?payment_id=' . $payment->id,
 ];
 
 $paymentResult = json_encode($paymentResult);
@@ -49,11 +45,6 @@ echo $paymentResult;
 //echo "<br><a href='". $_SESSION["HTTP_REFERER"]."'>Вернуться на страницу заказа </a>";
 //echo "<br><a href='". $_SESSION["HTTP_REFERER"]."'>Вернуться на страницу оплаты </a>";
 
-//var_dump($paymentResult);
-//var_dump($_SESSION);
-//session_destroy();
-//if (strstr($payment->status, "paid"))
-//    echo "paid";
 exit;
 $paymentResult = [
     'order_id' => $_GET["order_id"],

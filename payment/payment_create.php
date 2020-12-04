@@ -22,9 +22,6 @@ try {
      * Generate a unique order id for this example. It is important to include this unique attribute
      * in the redirectUrl (below) so a proper return page can be shown to the customer.
      */
-//    var_dump($_POST);
-//    var_dump($_GET);
-//    exit;
     $formData = $_POST;
 
     /*
@@ -34,17 +31,9 @@ try {
     $hostname = $_SERVER['HTTP_HOST'];
     $path = dirname(isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['PHP_SELF']);
     $url = $protocol . "://" . $hostname . $_SERVER['PHP_SELF'];
-//var_dump($_POST);
     session_start();
     $_SESSION['HTTP_REFERER'] = $_SERVER['HTTP_REFERER'];
 
-//    var_dump($_COOKIE);
-//    var_dump($_SERVER);
-//    var_dump($_SESSION);
-//    var_dump($HTTP_SESSION_VARS);
-//    session_destroy();
-
-//exit;
     /*
      * Payme(nt parameters:
      *   amount        Amount in EUROs. This example creates a € 10,- payment.
@@ -59,20 +48,15 @@ try {
     //обязательный формат .00
     $amount = number_format($formData['amount'], 2, '.', '');
 //    $amount = number_format(0.01 , 2, '.', '');
+
     $order_id = $formData['order_id'];
     $method = isset($formData['method']) ? $formData['method'] : "";
-
-//    "Order_ID":"' . $orderId . '", "prepayment":"true", "Paysum":"' . $payment->amount->value . '",
-//    "status":"' . $payment->status . '"
 
     $goods = [];
     foreach ($formData["your-product"] as $product) {
         $product = explode("*", $product);
         $goods[] = $product[1];
     }
-//    var_dump($goods);
-//    var_dump($formData["your-product"]);
-//    exit;
 
     $form1C = '{"Order_ID":"' . $order_id . '", "prepayment":"true", "Paysum":"0",
     "status":"open", "name":"' . $formData["your-firstname"] . '","lastname":"' . $formData["your-lastname"] .
@@ -83,24 +67,8 @@ try {
     "goods": ' . json_encode($goods) . ', "utm_campaign":null,"utm_content":null,"utm_medium":null,
     "utm_source":null,"utm_term":null, "url":"https:\/\/' . $hostname . '\/' . $hostname . '\/","IP_client":null}';
 
-//    {"utm_campaign":null,"utm_content":null,"utm_medium":null,"utm_source":null,"utm_term":null,
-//        "url":"https:\/\/prizeme.de\/mollie-test-2\/","IP_client":"172.68.239.105",
-//"name":"Sobachiy","lastname":"hren","phone":"493 8067 5449","billing_street":"gfdgdf","billing_housenumber":"12",
-//"billing_postcode":"04852","billing_city":"32323",
-//"email":"","type":"1","lead_id":"000000020","goods":["00-00000093"]}
-//    { "_wpcf7":"612","_wpcf7_version":"5.3","_wpcf7_locale":"ru_RU","_wpcf7_unit_tag":"wpcf7-f612-o1","_wpcf7_container_post":"0","_wpcf7_posted_data_hash":"","order_id":"2734852186","your-firstname":"","your-lastname":"","your-phone":"","billing_street":"","billing_housenumber":"","billing_postcode":"","billing_city":"","your-email":"","type":"1","lead-id":"000000020","form-product_qty":"0","your-product":["*00-00000093* Set \u00abHausapotheke\u00bb"],"amount":"55.80"
-//    }
-
-//        var_dump($form1C);
-//    exit;
-
     //Первая отправка данных о заказе
     $response = sendTo1C($form1C, "DE-MakeOrder");
-
-//    var_dump($response);
-//    exit;
-    //    $response = sendTo1C($form1C, "DEOrder");
-//    $response_error = sendTo1C('{"error":"1"', "DEOrder");
 
     //если данные не загрузились в 1С, то возвращаем ошибку не открывая систему оплаты
     if ($response != 200) {
