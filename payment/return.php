@@ -31,12 +31,19 @@ $payment = $mollie->payments->get($payment['mollie_payment_id']);
 
 //echo $payment->status;
 session_start();
+
+$return_href = isset($_SESSION["HTTP_REFERER"]) ? $_SESSION["HTTP_REFERER"] : "";
 $paymentResult = [
     'order_id' => $_GET["order_id"],
     'status' => $payment->status,
+    'amount' => $payment->amount->value,
 //    'return_href' => $_SESSION["HTTP_REFERER"]?$_SESSION["HTTP_REFERER"]:"/",
-    'return_href' => $_SESSION["HTTP_REFERER"],
-    'payment_href' => 'payment_create.php?payment_id=' . $payment->id,
+//    'return_href' => $_SESSION["HTTP_REFERER"],
+    'return_href' => $return_href,
+    'payment_href' =>
+        'payment_create.php?payment_id=' . $payment->id .
+        '&order_id=' . $_GET["order_id"] .
+        '&amount=' . $payment->amount->value
 ];
 
 $paymentResult = json_encode($paymentResult);

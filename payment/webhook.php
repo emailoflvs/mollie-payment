@@ -47,7 +47,7 @@ try {
     */
     database_write($orderId, $payment);
 
-    $form1C = '{"payment_id":"' . $payment->id . '","Order_ID":"' . $orderId . '", "prepayment":"true", "Paysum":"' . $payment->amount->value . '",
+    $form1C = '{"Order_ID":"' . $orderId . '", "payment_id":"' . $payment->id . '", "prepayment":"true", "Paysum":"' . $payment->amount->value . '",
     "status":"' . $payment->status . '"}';
 
     //отправка любых полученихуведомлений Mollie

@@ -22,7 +22,6 @@ try {
      * Generate a unique order id for this example. It is important to include this unique attribute
      * in the redirectUrl (below) so a proper return page can be shown to the customer.
      */
-    $formData = $_POST;
 
     /*
      * Determine the url parts to these example files.
@@ -33,6 +32,9 @@ try {
     $url = $protocol . "://" . $hostname . $_SERVER['PHP_SELF'];
     session_start();
     $_SESSION['HTTP_REFERER'] = $_SERVER['HTTP_REFERER'];
+
+
+    $formData = isset($_GET['payment_id']) ? $_GET : $_POST;
 
     /*
      * Payme(nt parameters:
@@ -50,30 +52,38 @@ try {
 //    $amount = number_format(0.01 , 2, '.', '');
 
     $order_id = $formData['order_id'];
-    $method = isset($formData['method']) ? $formData['method'] : "";
 
-    $goods = [];
-    foreach ($formData["your-product"] as $product) {
-        $product = explode("*", $product);
-        $goods[] = $product[1];
-    }
+    if (!isset($formData['payment_id'])) {
 
-    $form1C = '{"Order_ID":"' . $order_id . '", "prepayment":"true", "Paysum":"0",
+        $method = isset($formData['method']) ? $formData['method'] : "";
+
+        $goods = [];
+        foreach ($formData["your-product"] as $product) {
+            $product = explode("*", $product);
+            $goods[] = $product[1];
+        }
+
+        $form1C = '{"Order_ID":"' . $order_id . '", "prepayment":"true", "Paysum":"0",
     "status":"open", "name":"' . $formData["your-firstname"] . '","lastname":"' . $formData["your-lastname"] .
-        '", "phone":"' . $formData["your-phone"] . '", "billing_street":"' . $formData["billing_street"] .
-        '", "billing_housenumber":"' . $formData["billing_housenumber"] . '","billing_postcode":"'
-        . $formData["billing_postcode"] . '", "billing_city":"' . $formData["billing_city"] . '", "email":"' .
-        $formData["your-email"] . '","type":"' . $formData["type"] . '","lead_id":"' . $formData["lead-id"] . '",
+            '", "phone":"' . $formData["your-phone"] . '", "billing_street":"' . $formData["billing_street"] .
+            '", "billing_housenumber":"' . $formData["billing_housenumber"] . '","billing_postcode":"'
+            . $formData["billing_postcode"] . '", "billing_city":"' . $formData["billing_city"] . '", "email":"' .
+            $formData["your-email"] . '","type":"' . $formData["type"] . '","lead_id":"' . $formData["lead-id"] . '",
     "goods": ' . json_encode($goods) . ', "utm_campaign":null,"utm_content":null,"utm_medium":null,
     "utm_source":null,"utm_term":null, "url":"https:\/\/' . $hostname . '\/' . $hostname . '\/","IP_client":null}';
 
-    //Первая отправка данных о заказе
-    $response = sendTo1C($form1C, "DE-MakeOrder");
+        //Первая отправка данных о заказе
+        $response = sendTo1C($form1C, "DE-MakeOrder");
+//        $response = sendTo1C($form1C, "DETEST-MakeOrder");
 
-    //если данные не загрузились в 1С, то возвращаем ошибку не открывая систему оплаты
-    if ($response != 200) {
-        echo "Ошибка отправки данных в 1С (error " . $response . ")";
-        exit;
+        //если данные не загрузились в 1С, то возвращаем ошибку не открывая систему оплаты
+        if ($response != 200) {
+            echo "Ошибка отправки данных в 1С (error " . $response . ")";
+            exit;
+        }
+
+        // ожидание в течениe 1 секунд
+        sleep(1);
     }
 
     $paymentForm = [
@@ -94,7 +104,7 @@ try {
 
     $payment = $mollie->payments->create($paymentForm);
 
-    $form1C = '{"payment_id":"' . $payment->id . '","Order_ID":"' . $order_id . '", "prepayment":"true", "Paysum":"' . $payment->amount->value . '",
+    $form1C = '{"Order_ID":"' . $order_id . '", "payment_id":"' . $payment->id . '", "prepayment":"true", "Paysum":"' . $payment->amount->value . '",
     "status":"' . $payment->status . '"}';
 
     //отправка данных о заказе,  послезапуска Mollie

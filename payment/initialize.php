@@ -18,10 +18,10 @@ $mollie = new \Mollie\Api\MollieApiClient();
 //$mollie->setApiKey("test_dHar4XY7LxsDOtmnkVtjNVWXLSlXsM");
 
 //Live API key = live_MJy6t7RuHscRvkyTu7JHMsnHPgQ7t7
-//$apiKey = "live_MJy6t7RuHscRvkyTu7JHMsnHPgQ7t7";
+$apiKey = "live_MJy6t7RuHscRvkyTu7JHMsnHPgQ7t7";
 
 //Test API key = test_y3e3j5UR3upkHrgjhtW9vQ6Hj7hkw5
-$apiKey = "test_y3e3j5UR3upkHrgjhtW9vQ6Hj7hkw5";
+//$apiKey = "test_y3e3j5UR3upkHrgjhtW9vQ6Hj7hkw5";
 
 $mollie->setApiKey($apiKey);
 
